@@ -2,7 +2,7 @@
 #include <math.h>
 #include <stdio.h>
 
-/*Normalize a 3D vector to unit length*/
+/* Normalize a 3D vector to unit length */
 void normalize(float *x, float *y, float *z)
 {
     float len = sqrt((*x)*(*x) + (*y)*(*y) + (*z)*(*z));
@@ -14,7 +14,7 @@ void normalize(float *x, float *y, float *z)
     }
 }
 
-/* Diffuse lighting using Lambert's law*/
+/* Diffuse lighting using Lambert's law */
 float diffuseLight(float Nx, float Ny, float Nz,
                    float Lx, float Ly, float Lz,
                    float Kd, float Il)
@@ -28,7 +28,7 @@ float diffuseLight(float Nx, float Ny, float Nz,
     return Kd * Il * dot;
 }
 
-/*Specular lighting using Phong model*/
+/* Specular lighting using Phong model */
 float specularLight(float Nx, float Ny, float Nz,
                     float Lx, float Ly, float Lz,
                     float Vx, float Vy, float Vz,
@@ -54,11 +54,12 @@ float specularLight(float Nx, float Ny, float Nz,
     return Ks * Il * pow(dotRV, ns);
 }
 
-/*Draw a shaded sphere using Phong illumination*/
+/* Draw a shaded sphere using Phong illumination */
 void drawPhongSphere(int cx, int cy, int radius,
                      float Lx, float Ly, float Lz,
                      float Ka, float Kd, float Ks,
-                     int ns, float Il)
+                     int ns, float Il,
+                     float Rc, float Gc, float Bc)
 {
     int x, y;
 
@@ -99,82 +100,69 @@ void drawPhongSphere(int cx, int cy, int radius,
                 if (I > 1) I = 1;
 
                 putpixel(cx + x, cy - y,
-                         COLOR((int)(255*I), 0, 0));
+                         COLOR((int)(Rc*I),
+                               (int)(Gc*I),
+                               (int)(Bc*I)));
             }
         }
     }
 }
-draw_proton(int Pcx, int Pcy, int Pradius)
+
+/* Proton (Red) */
+void draw_proton(int Pcx, int Pcy, int Pradius)
 {
-
-    /* Light source position */
-    float Lx = 200;
-    float Ly = 100;
-    float Lz = 200;
-
-    /* Material properties */
-    float Ka = 0.2;   /* Ambient coefficient */
-    float Kd = 0.6;   /* Diffuse coefficient */
-    float Ks = 0.4;   /* Specular coefficient */
-    int ns = 20;      /* Shininess factor */
-    float Il = 1.0;   /* Light intensity */
+    float Lx = 200, Ly = 100, Lz = 200;
+    float Ka = 0.2, Kd = 0.6, Ks = 0.4;
+    int ns = 20;
+    float Il = 1.0;
 
     drawPhongSphere(Pcx, Pcy, Pradius,
-                     Lx, Ly, Lz,
-                     Ka, Kd, Ks,
-                     ns, Il);
+                    Lx, Ly, Lz,
+                    Ka, Kd, Ks,
+                    ns, Il,
+                    255, 0, 0);
 }
-draw_neutron(int Ncx, int Ncy, int Nradius)
+
+/* Neutron (White) */
+void draw_neutron(int Ncx, int Ncy, int Nradius)
 {
-
-    /* Light source position */
-    float Lx = 200;
-    float Ly = 100;
-    float Lz = 200;
-
-    /* Material properties */
-    float Ka = 0.2;   /* Ambient coefficient */
-    float Kd = 0.6;   /* Diffuse coefficient */
-    float Ks = 0.4;   /* Specular coefficient */
-    int ns = 20;      /* Shininess factor */
-    float Il = 1.0;   /* Light intensity */
+    float Lx = 200, Ly = 100, Lz = 200;
+    float Ka = 0.2, Kd = 0.6, Ks = 0.4;
+    int ns = 20;
+    float Il = 1.0;
 
     drawPhongSphere(Ncx, Ncy, Nradius,
-                     Lx, Ly, Lz,
-                     Ka, Kd, Ks,
-                     ns, Il);
+                    Lx, Ly, Lz,
+                    Ka, Kd, Ks,
+                    ns, Il,
+                    255, 255, 255);
 }
-draw_electron(int Ecx, int Ecy, int Eradius)
+
+/* Electron (Sky Blue) */
+void draw_electron(int Ecx, int Ecy, int Eradius)
 {
-
-    /* Light source position */
-    float Lx = 200;
-    float Ly = 100;
-    float Lz = 200;
-
-    /* Material properties */
-    float Ka = 0.2;   /* Ambient coefficient */
-    float Kd = 0.6;   /* Diffuse coefficient */
-    float Ks = 0.4;   /* Specular coefficient */
-    int ns = 20;      /* Shininess factor */
-    float Il = 1.0;   /* Light intensity */
+    float Lx = 200, Ly = 100, Lz = 200;
+    float Ka = 0.2, Kd = 0.6, Ks = 0.4;
+    int ns = 20;
+    float Il = 1.0;
 
     drawPhongSphere(Ecx, Ecy, Eradius,
-                     Lx, Ly, Lz,
-                     Ka, Kd, Ks,
-                     ns, Il);
+                    Lx, Ly, Lz,
+                    Ka, Kd, Ks,
+                    ns, Il,
+                    135, 206, 235);
 }
-/*Main function */
+
+/* Main function */
 int main()
 {
     int gd = DETECT, gm;
     initgraph(&gd, &gm, "C:\\TURBOC3\\BGI");
 
-    int cx = 320, cy = 240;
-    int radius = 100;
-    draw_proton(cx,cy,radius);
-    daw_neutrom(380,240,100);
-    draw_electron(400,240,50);
+    draw_proton(250, 240, 80);
+    draw_neutron(400, 240, 80);
+    draw_electron(550, 240, 50);
+
     getch();
     closegraph();
     return 0;
