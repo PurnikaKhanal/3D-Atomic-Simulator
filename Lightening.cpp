@@ -132,7 +132,7 @@ int main()
 
     int cx = 320, cy = 240;
     int radius = 100;
-    drawproton(cx,cy,radius);
+    draw_proton(cx,cy,radius);
     getch();
     closegraph();
     return 0;
