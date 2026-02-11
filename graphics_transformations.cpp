@@ -1,8 +1,6 @@
 #include "graphics_transformations.h"
 #include <iostream>
 
-// ==================== HELPER FUNCTIONS ====================
-
 // Initialize identity matrix
 void createIdentityMatrix(Matrix4x4& mat) {
     for (int i = 0; i < 4; i++) {
@@ -53,8 +51,6 @@ Vector3 cross(const Vector3& a, const Vector3& b) {
 float dot(const Vector3& a, const Vector3& b) {
     return a.x * b.x + a.y * b.y + a.z * b.z;
 }
-
-// ==================== 3D TRANSFORMATION FUNCTIONS ====================
 
 // Create Translation Matrix
 // T = [[1, 0, 0, tx],
@@ -110,8 +106,6 @@ Vector4 multiplyMatrixVector(const Matrix4x4& mat, const Vector4& vec) {
     return result;
 }
 
-// ==================== COMPOSITE TRANSFORMATION ====================
-
 // Create composite transformation matrix: M = T * R * S
 // (translation * rotation * scale)
 
@@ -127,8 +121,6 @@ void createCompositeMatrix(const Vector3& scale, float rotationAngle, const Vect
     multiplyMatrices(T, R, TR);
     multiplyMatrices(TR, S, result);
 }
-
-// ==================== PROJECTION AND VIEWING TRANSFORMATIONS ====================
 
 // Create View Matrix from camera parameters
 // Uses the camera's eye point, target point, and up vector to construct
@@ -208,3 +200,4 @@ void viewportTransform(float ndcX, float ndcY, int screenWidth, int screenHeight
     if (pixelY < 0) pixelY = 0;
     if (pixelY >= screenHeight) pixelY = screenHeight - 1;
 }
+
