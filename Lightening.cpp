@@ -124,6 +124,46 @@ draw_proton(int Pcx, int Pcy, int Pradius)
                      Ka, Kd, Ks,
                      ns, Il);
 }
+draw_neutron(int Ncx, int Ncy, int Nradius)
+{
+
+    /* Light source position */
+    float Lx = 200;
+    float Ly = 100;
+    float Lz = 200;
+
+    /* Material properties */
+    float Ka = 0.2;   /* Ambient coefficient */
+    float Kd = 0.6;   /* Diffuse coefficient */
+    float Ks = 0.4;   /* Specular coefficient */
+    int ns = 20;      /* Shininess factor */
+    float Il = 1.0;   /* Light intensity */
+
+    drawPhongSphere(Ncx, Ncy, Nradius,
+                     Lx, Ly, Lz,
+                     Ka, Kd, Ks,
+                     ns, Il);
+}
+draw_electron(int Ecx, int Ecy, int Eradius)
+{
+
+    /* Light source position */
+    float Lx = 200;
+    float Ly = 100;
+    float Lz = 200;
+
+    /* Material properties */
+    float Ka = 0.2;   /* Ambient coefficient */
+    float Kd = 0.6;   /* Diffuse coefficient */
+    float Ks = 0.4;   /* Specular coefficient */
+    int ns = 20;      /* Shininess factor */
+    float Il = 1.0;   /* Light intensity */
+
+    drawPhongSphere(Ecx, Ecy, Eradius,
+                     Lx, Ly, Lz,
+                     Ka, Kd, Ks,
+                     ns, Il);
+}
 /*Main function */
 int main()
 {
@@ -133,6 +173,8 @@ int main()
     int cx = 320, cy = 240;
     int radius = 100;
     draw_proton(cx,cy,radius);
+    daw_neutrom(380,240,100);
+    draw_electron(400,240,50);
     getch();
     closegraph();
     return 0;
