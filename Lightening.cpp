@@ -104,15 +104,8 @@ void drawPhongSphere(int cx, int cy, int radius,
         }
     }
 }
-
-/*Main function */
-int main()
+draw_proton(int Pcx, int Pcy, int Pradius)
 {
-    int gd = DETECT, gm;
-    initgraph(&gd, &gm, "C:\\TURBOC3\\BGI");
-
-    int cx = 320, cy = 240;
-    int radius = 100;
 
     /* Light source position */
     float Lx = 200;
@@ -126,11 +119,20 @@ int main()
     int ns = 20;      /* Shininess factor */
     float Il = 1.0;   /* Light intensity */
 
-    drawPhongSphere(cx, cy, radius,
+    drawPhongSphere(Pcx, Pcy, Pradius,
                      Lx, Ly, Lz,
                      Ka, Kd, Ks,
                      ns, Il);
+}
+/*Main function */
+int main()
+{
+    int gd = DETECT, gm;
+    initgraph(&gd, &gm, "C:\\TURBOC3\\BGI");
 
+    int cx = 320, cy = 240;
+    int radius = 100;
+    drawproton(cx,cy,radius);
     getch();
     closegraph();
     return 0;
