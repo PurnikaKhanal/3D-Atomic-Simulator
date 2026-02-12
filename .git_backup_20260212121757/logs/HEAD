@@ -1,9 +1,0 @@
-0000000000000000000000000000000000000000 bd5eea6e79b0969d24b80f9d773a467a8f827678 unknown <khanalpurnika@gmail.com> 1770827473 +0545	commit (initial): first commit
-bd5eea6e79b0969d24b80f9d773a467a8f827678 0000000000000000000000000000000000000000 unknown <khanalpurnika@gmail.com> 1770827492 +0545	Branch: renamed refs/heads/master to refs/heads/main
-0000000000000000000000000000000000000000 bd5eea6e79b0969d24b80f9d773a467a8f827678 unknown <khanalpurnika@gmail.com> 1770827492 +0545	Branch: renamed refs/heads/master to refs/heads/main
-bd5eea6e79b0969d24b80f9d773a467a8f827678 fa8748109e1a388fa89343bb0f86d9d36cb8da18 unknown <khanalpurnika@gmail.com> 1770827891 +0545	commit: Commit1
-fa8748109e1a388fa89343bb0f86d9d36cb8da18 5eb406729f277b73367dc936d865f066e53bddfd unknown <khanalpurnika@gmail.com> 1770827908 +0545	pull origin main --rebase (start): checkout 5eb406729f277b73367dc936d865f066e53bddfd
-5eb406729f277b73367dc936d865f066e53bddfd 3bb8b4c3efc9c4dfe0414f1499b16dca18e2e040 unknown <khanalpurnika@gmail.com> 1770828095 +0545	rebase (continue): first commit
-3bb8b4c3efc9c4dfe0414f1499b16dca18e2e040 5c1acac192a90b5d9b581432069e019001080128 PurnikaKhanal <khanalpurnika@gmail.com> 1770875962 +0545	commit: Before pull
-5c1acac192a90b5d9b581432069e019001080128 5c1acac192a90b5d9b581432069e019001080128 PurnikaKhanal <khanalpurnika@gmail.com> 1770875994 +0545	rebase (finish): returning to refs/heads/main
-5c1acac192a90b5d9b581432069e019001080128 c40c002f297817dc27f0b672a7fcf75551b7d5ff PurnikaKhanal <khanalpurnika@gmail.com> 1770877298 +0545	commit (merge): Resolve merge conflict: keep ours for graphics_transformations.cpp
