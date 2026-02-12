@@ -1,276 +1,108 @@
 #ifndef GRAPHICS_TRANSFORMATIONS_H
 #define GRAPHICS_TRANSFORMATIONS_H
 
+#include <graphics.h>
 #include <cmath>
-#include<iostream>
+#include <windows.h>
 
-// ==================== DATA STRUCTURES ====================
+// Extern globals defined in main.cpp that transformation/input helpers use
+extern float rotationX;
+extern float rotationY;
+extern float zoom;
+extern int lastMouseX;
+extern int lastMouseY;
+extern bool mouseActive;
 
-// 3D Vector
-struct Vector3 {
-    float x, y, z;
-};
+// Apply 2D rotation transformation to a point (in-place).
+inline void rotatePoint(int& x, int& y, float angleX, float angleY) {
+    float radY = angleY * 3.14159265f / 180.0f;
+    float cosY = cosf(radY);
+    float sinY = sinf(radY);
 
-// 4D Vector (Homogeneous Coordinates)
-struct Vector4 {
-    float x, y, z, w;
-};
+    int tempX = x;
+    x = (int)(tempX * cosY - y * sinY);
+    y = (int)(tempX * sinY + y * cosY);
 
-// 4x4 Matrix
-typedef float Matrix4x4[4][4];
+    float radX = angleX * 3.14159265f / 180.0f;
+    float cosX = cosf(radX);
+    int tempY = y;
+    y = (int)(tempY * cosX);
+}
 
-// Camera Structure
-struct Camera {
-    Vector3 eye;      // Camera position
-    Vector3 target;   // Look-at point
-    Vector3 up;       // Up vector
-};
+// Handle keyboard input for interactive control (uses extern globals).
+inline void handleKeyboardInput() {
+    if (GetAsyncKeyState('W') & 0x8000) rotationX -= 2.0f;
+    if (GetAsyncKeyState('S') & 0x8000) rotationX += 2.0f;
+    if (GetAsyncKeyState('A') & 0x8000) rotationY -= 2.0f;
+    if (GetAsyncKeyState('D') & 0x8000) rotationY += 2.0f;
 
-// ==================== HELPER FUNCTIONS ====================
+    if (GetAsyncKeyState('Q') & 0x8000 || GetAsyncKeyState(187) & 0x8000) {
+        zoom += 0.05f;
+        if (zoom > 3.0f) zoom = 3.0f;
+    }
+    if (GetAsyncKeyState('E') & 0x8000 || GetAsyncKeyState(189) & 0x8000) {
+        zoom -= 0.05f;
+        if (zoom < 0.5f) zoom = 0.5f;
+    }
 
-// Initialize identity matrix
-void createIdentityMatrix(Matrix4x4& mat);
+    if (GetAsyncKeyState('R') & 0x8000) {
+        rotationX = 0.0f;
+        rotationY = 0.0f;
+        zoom = 1.0f;
+    }
 
-// Multiply two 4x4 matrices: result = a * b
-void multiplyMatrices(const Matrix4x4& a, const Matrix4x4& b, Matrix4x4& result);
+    if (rotationY >= 360.0f) rotationY -= 360.0f;
+    if (rotationY < 0.0f) rotationY += 360.0f;
+    if (rotationX > 89.0f) rotationX = 89.0f;
+    if (rotationX < -89.0f) rotationX = -89.0f;
+}
 
-// Normalize a 3D vector
-Vector3 normalize(const Vector3& v);
+// Handle mouse input for interactive control (uses extern globals).
+inline void handleMouseInput() {
+    int mouseX, mouseY;
 
-// Cross product of two 3D vectors
-Vector3 cross(const Vector3& a, const Vector3& b);
+    if (ismouseclick(WM_LBUTTONDOWN)) {
+        getmouseclick(WM_LBUTTONDOWN, mouseX, mouseY);
+        lastMouseX = mouseX;
+        lastMouseY = mouseY;
+        mouseActive = true;
+    }
 
-// Dot product of two 3D vectors
-float dot(const Vector3& a, const Vector3& b);
+    if (ismouseclick(WM_MOUSEMOVE)) {
+        getmouseclick(WM_MOUSEMOVE, mouseX, mouseY);
+        if (mouseActive) {
+            int deltaX = mouseX - lastMouseX;
+            int deltaY = mouseY - lastMouseY;
 
-// ==================== 3D TRANSFORMATION FUNCTIONS ====================
+            rotationY += deltaX * 0.5f;
+            rotationX += deltaY * 0.5f;
 
-// Create Translation Matrix
-void createTranslationMatrix(float tx, float ty, float tz, Matrix4x4& mat);
+            if (rotationY >= 360.0f) rotationY -= 360.0f;
+            if (rotationY < 0.0f) rotationY += 360.0f;
+            if (rotationX > 89.0f) rotationX = 89.0f;
+            if (rotationX < -89.0f) rotationX = -89.0f;
 
-// Create Rotation Matrix around Z-axis
-void createRotationMatrixZ(float angleInRadians, Matrix4x4& mat);
-
-// Create Scale Matrix
-void createScaleMatrix(float sx, float sy, float sz, Matrix4x4& mat);
-
-// Multiply a 4x4 matrix by a 4D vector: result = mat * vec
-Vector4 multiplyMatrixVector(const Matrix4x4& mat, const Vector4& vec);
-
-// ==================== COMPOSITE TRANSFORMATION ====================
-
-// Create composite transformation matrix: M = T * R * S
-void createCompositeMatrix(const Vector3& scale, float rotationAngle, const Vector3& translation, Matrix4x4& result);
-
-// ==================== PROJECTION AND VIEWING TRANSFORMATIONS ====================
-
-// Create View Matrix from camera parameters
-void createViewMatrix(const Camera& cam, Matrix4x4& mat);
-
-// Create Perspective Projection Matrix
-void createPerspectiveMatrix(float fov, float aspectRatio, float nearPlane, float farPlane, Matrix4x4& mat);
-
-// Viewport Transform: Convert NDC coordinates to screen pixel coordinates
-void viewportTransform(float ndcX, float ndcY, int screenWidth, int screenHeight, int& pixelX, int& pixelY);
-
-// Initialize identity matrix
-void createIdentityMatrix(Matrix4x4& mat) {
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            mat[i][j] = (i == j) ? 1.0f : 0.0f;
+            lastMouseX = mouseX;
+            lastMouseY = mouseY;
         }
     }
-}
 
-// Multiply two 4x4 matrices: result = a * b
-void multiplyMatrices(const Matrix4x4& a, const Matrix4x4& b, Matrix4x4& result) {
-    Matrix4x4 temp;
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            temp[i][j] = 0.0f;
-            for (int k = 0; k < 4; k++) {
-                temp[i][j] += a[i][k] * b[k][j];
-            }
-        }
+    if (ismouseclick(WM_LBUTTONUP)) {
+        getmouseclick(WM_LBUTTONUP, mouseX, mouseY);
+        mouseActive = false;
     }
-    // Copy result back
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            result[i][j] = temp[i][j];
-        }
+
+    if (ismouseclick(WM_RBUTTONDOWN)) {
+        getmouseclick(WM_RBUTTONDOWN, mouseX, mouseY);
+        zoom += 0.1f;
+        if (zoom > 3.0f) zoom = 3.0f;
     }
-}
 
-// Normalize a 3D vector
-Vector3 normalize(const Vector3& v) {
-    float length = std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
-    if (length > 0.0f) {
-        return {v.x / length, v.y / length, v.z / length};
+    if (ismouseclick(WM_MBUTTONDOWN)) {
+        getmouseclick(WM_MBUTTONDOWN, mouseX, mouseY);
+        zoom -= 0.1f;
+        if (zoom < 0.5f) zoom = 0.5f;
     }
-    return v;
-}
-
-// Cross product of two 3D vectors
-Vector3 cross(const Vector3& a, const Vector3& b) {
-    return {
-        a.y * b.z - a.z * b.y,
-        a.z * b.x - a.x * b.z,
-        a.x * b.y - a.y * b.x
-    };
-}
-
-// Dot product of two 3D vectors
-float dot(const Vector3& a, const Vector3& b) {
-    return a.x * b.x + a.y * b.y + a.z * b.z;
-}
-
-// Create Translation Matrix
-// T = [[1, 0, 0, tx],
-//      [0, 1, 0, ty],
-//      [0, 0, 1, tz],
-//      [0, 0, 0,  1]]
-
-void createTranslationMatrix(float tx, float ty, float tz, Matrix4x4& mat) {
-    createIdentityMatrix(mat);
-    mat[0][3] = tx;
-    mat[1][3] = ty;
-    mat[2][3] = tz;
-}
-
-// Create Rotation Matrix around Z-axis
-// Rz (θ) = [[cos(θ), -sin(θ), 0, 0],
-//          [sin(θ),  cos(θ), 0, 0],
-//          [0,       0,      1, 0],
-//          [0,       0,      0, 1]]
-
-void createRotationMatrixZ(float angleInRadians, Matrix4x4& mat) {
-    createIdentityMatrix(mat);
-    
-    float cosA = std::cos(angleInRadians);
-    float sinA = std::sin(angleInRadians);
-    
-    mat[0][0] = cosA;
-    mat[0][1] = -sinA;
-    mat[1][0] = sinA;
-    mat[1][1] = cosA;
-}
-
-// Create Scale Matrix
-// S = [[sx,  0,  0, 0],
-//      [0,  sy,  0, 0],
-//      [0,  0,  sz, 0],
-//      [0,  0,  0,  1]]
-
-void createScaleMatrix(float sx, float sy, float sz, Matrix4x4& mat) {
-    createIdentityMatrix(mat);
-    mat[0][0] = sx;
-    mat[1][1] = sy;
-    mat[2][2] = sz;
-}
-
-// Multiply a 4x4 matrix by a 4D vector: result = mat * vec
-Vector4 multiplyMatrixVector(const Matrix4x4& mat, const Vector4& vec) {
-    Vector4 result;
-    result.x = mat[0][0] * vec.x + mat[0][1] * vec.y + mat[0][2] * vec.z + mat[0][3] * vec.w;
-    result.y = mat[1][0] * vec.x + mat[1][1] * vec.y + mat[1][2] * vec.z + mat[1][3] * vec.w;
-    result.z = mat[2][0] * vec.x + mat[2][1] * vec.y + mat[2][2] * vec.z + mat[2][3] * vec.w;
-    result.w = mat[3][0] * vec.x + mat[3][1] * vec.y + mat[3][2] * vec.z + mat[3][3] * vec.w;
-    return result;
-}
-
-// Create composite transformation matrix: M = T * R * S
-// (translation * rotation * scale)
-
-void createCompositeMatrix(const Vector3& scale, float rotationAngle, const Vector3& translation, Matrix4x4& result) {
-    // Create individual matrices
-    Matrix4x4 S, R, T, TR;
-    
-    createScaleMatrix(scale.x, scale.y, scale.z, S);
-    createRotationMatrixZ(rotationAngle, R);
-    createTranslationMatrix(translation.x, translation.y, translation.z, T);
-    
-    // Composite: M = T * R * S
-    multiplyMatrices(T, R, TR);
-    multiplyMatrices(TR, S, result);
-}
-
-// Create View Matrix from camera parameters
-// Uses the camera's eye point, target point, and up vector to construct
-// a view matrix that transforms from world space to view space
-void createViewMatrix(const Camera& cam, Matrix4x4& mat) {
-
-    // 1. Calculate forward (negative Z) vector: n = normalize(eye - target)
-    
-    Vector3 n = normalize({
-        cam.eye.x - cam.target.x,
-        cam.eye.y - cam.target.y,
-        cam.eye.z - cam.target.z
-    });
-    
-    // 2. Calculate right vector: u = normalize(up × n)
-    Vector3 u = normalize(cross(cam.up, n));
-    
-    // 3. Calculate true up vector: v = n × u
-    Vector3 v = cross(n, u);
-    
-    // 4. Construct view matrix
-    //[ux  uy  uz  -u·eye]
-    // [vx  vy  vz  -v·eye]
-    // [nx  ny  nz  -n·eye]
-    // [0   0   0      1   ]
-
-    createIdentityMatrix(mat);
-    
-    mat[0][0] = u.x;
-    mat[0][1] = u.y;
-    mat[0][2] = u.z;
-    mat[0][3] = -dot(u, cam.eye);
-    
-    mat[1][0] = v.x;
-    mat[1][1] = v.y;
-    mat[1][2] = v.z;
-    mat[1][3] = -dot(v, cam.eye);
-    
-    mat[2][0] = n.x;
-    mat[2][1] = n.y;
-    mat[2][2] = n.z;
-    mat[2][3] = -dot(n, cam.eye);
-}
-
-// Create Perspective Projection Matrix
-// Standard OpenGL perspective projection matrix
-// fov: field of view in radians
-// aspectRatio: width / height
-// nearPlane: distance to near clipping plane
-// farPlane: distance to far clipping plane
-void createPerspectiveMatrix(float fov, float aspectRatio, float nearPlane, float farPlane, Matrix4x4& mat) {
-    createIdentityMatrix(mat);
-    
-    float f = 1.0f / std::tan(fov / 2.0f);
-    float rangeInv = 1.0f / (nearPlane - farPlane);
-    
-    mat[0][0] = f / aspectRatio;
-    mat[1][1] = f;
-    mat[2][2] = (nearPlane + farPlane) * rangeInv;
-    mat[2][3] = 2.0f * nearPlane * farPlane * rangeInv;
-    mat[3][2] = -1.0f;
-    mat[3][3] = 0.0f;
-}
-
-// Viewport Transform: Convert NDC coordinates to screen pixel coordinates
-// NDC range:[-1, 1] for both x and y
-// Screen range: [0, screenWidth] and [0, screenHeight]
-// Note: Y-axis is inverted (NDC's -1 maps to screen height, NDC's 1 maps to 0)
-void viewportTransform(float ndcX, float ndcY, int screenWidth, int screenHeight, int& pixelX, int& pixelY) {
-    // Map from NDC[-1, 1] to screen [0, width/height]
-    pixelX = (int)((ndcX + 1.0f) * 0.5f * (screenWidth - 1));
-    pixelY = (int)((1.0f - ndcY) * 0.5f * (screenHeight - 1));
-    
-    // Clamp to screen bounds
-    if (pixelX < 0) pixelX = 0;
-    if (pixelX >= screenWidth) pixelX = screenWidth - 1;
-    if (pixelY < 0) pixelY = 0;
-    if (pixelY >= screenHeight) pixelY = screenHeight - 1;
 }
 
 #endif // GRAPHICS_TRANSFORMATIONS_H

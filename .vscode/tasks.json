@@ -7,7 +7,6 @@
             "command": "g++",
             "args": [
                 "main.cpp",
-                "graphics_transformations.cpp",
                 "-o",
                 "graphics_app.exe",
                 "-lbgi",
