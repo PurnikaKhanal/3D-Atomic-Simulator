@@ -1,0 +1,42 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Graphics Project",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "main.cpp",
+                "graphics_transformations.cpp",
+                "-o",
+                "graphics_app.exe",
+                "-lbgi",
+                "-lgdi32",
+                "-lcomdlg32",
+                "-luuid",
+                "-loleaut32",
+                "-lole32",
+                "-lm"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$gcc"],
+            "presentation": {
+                "reveal": "always"
+            }
+        },
+        {
+            "label": "Run Graphics Program",
+            "type": "shell",
+            "command": "${workspaceFolder}/graphics_app.exe",
+            "group": {
+                "kind": "test"
+            },
+            "presentation": {
+                "reveal": "always"
+            }
+        }
+    ]
+}
